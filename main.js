@@ -6,13 +6,22 @@ const gameBoard = (() => {
     const getBoard = () => board;
 
     const createBoard = () => {
-        board = [' ',' ',' ',' ',' ',' ',' ',' ',' '];
+        board = ['','','','','','','','',''];
     };
+
+    const setBoardHandlers = e => {
+        const container = document.querySelector(".container").children;
+        container.array.forEach(element => {
+            const curPlayer = Players[e.target.id];
+            element.addEventListener('click', curPlayer.placeMove);
+        });
+    }
 
     return{
         setBoard: setBoard,
         getBoard: getBoard,
-        createBoard
+        createBoard,
+        setBoardHandlers
     };
 })();
 
@@ -46,13 +55,17 @@ const Player = (name, marker) => {
     }
 
     const placeMove = e => {
-        if (e.target == 'x' || 'o') {
+        if (e.target == 'x' || e.target == 'o') {
             return;
         } else {
-            const board = getBoard();
-            board[e.target.id] = playerMarker;
+            const board = gameBoard.getBoard();
+            board[e.target.id - 1] = playerMarker;
+            gameBoard.setBoard(board);
         }
         displayController.displayGameBoard();
+        // change player turn
+        playerTurn = (Players[0].id == 0) ? Players[1].id : Players[0].id;
+
     };
 
     return {
@@ -76,9 +89,7 @@ function playGame() {
 
     Players.push(player1);
     Players.push(player2);   
-    console.log(Players[0].id);
-    const playerTurn = (Players[0].id == 0) ? Players[1].id : Players[0].id;
-    console.log(playerTurn);
+    // const playerTurn = (Players[0].id == 0) ? Players[1].id : Players[0].id;
 
     displayController.displayGameBoard();
 
