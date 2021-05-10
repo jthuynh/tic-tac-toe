@@ -1,5 +1,4 @@
 const gameBoard = (() => {
-    // let board = ['x','o','x','o','x','o','x','o','x'];
     let board = [];
 
     const setBoard = (newBoard) => board = newBoard;
@@ -9,23 +8,38 @@ const gameBoard = (() => {
         board = ['','','','','','','','',''];
     };
 
-    const setBoardHandlers = e => {
-        const container = document.querySelector(".container").children;
-        container.array.forEach(element => {
-            const curPlayer = Players[e.target.id];
-            element.addEventListener('click', curPlayer.placeMove);
-        });
+    const placeMove = (index, mark) => {
+        board[index] = mark
+    }
+
+    const getMove = (index) => {
+        return board[index]
+    }
+
+    const isBoardFull = () => {
+        for (let i = 0; i < board.length; i++) {
+            if (board[i] == '') {
+                return false
+            }
+        }
+
+        return true
     }
 
     return{
         setBoard: setBoard,
         getBoard: getBoard,
         createBoard,
-        setBoardHandlers
+        placeMove,
+        getMove,
+        isBoardFull,
+        // setBoardHandlers
     };
 })();
 
 const displayController =(() => {
+    let turn = 0
+    let players = [];
     const displayGameBoard = () => {
         let board = gameBoard.getBoard();
 
@@ -34,65 +48,109 @@ const displayController =(() => {
             container[i].innerHTML = board[i];
         }
     }
+
+    const changePlayer = () => {
+        (turn == 0) ? turn = 1: turn = 0
+        // console.log(turn)
+    }
+
+    const checkWin = () => {
+        board = gameBoard.getBoard();
+        const winLines = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
+        for (let i = 0; i < winLines.length; i++) {
+            if (board[winLines[i][0]] != "" && 
+                board[winLines[i][0]] === board[winLines[i][1]] && 
+                board[winLines[i][0]] === board[winLines[i][2]]) {
+                    return true
+            } 
+        }
+
+        return false
+    }
+
+    const endGame = result => {
+        if (result == "t") {
+            alert("There was a tie!");
+        } else if (result == "0") {
+            alert("Player 1 won!");
+        } else if (result == "1") {
+            alert("Player 2 won!");
+        }
+
+        // remove all handlers
+    }
+
+    const init = () => {
+        // Set up the board
+        gameBoard.createBoard();
+        // Set up the players
+        const player1 = Player('player1', 'x');
+        const player2 = Player('player2', 'o');
+        players.push(player1);
+        players.push(player2);
+        // play game
+        playGame();
+    }
+
+    const clickFunction = e => {
+        // place Move
+        players[turn].placeMove(e);
+        // remove Click Function from current id
+        const tile = document.getElementById(e.target.id);
+        tile.removeEventListener("click", clickFunction, false);
+        // display board
+        displayGameBoard();
+        // check for win
+        if (checkWin()) {
+            endGame(`${turn}`);
+        } else if (gameBoard.isBoardFull()) {
+            endGame("t");
+        }
+        changePlayer();
+    }
+
+    const playGame = () => {
+        // set up the handlers for clicking on each tile
+        const container = document.querySelector(".container").children;
+        for (item of container) {
+            item.addEventListener("click", clickFunction);
+        }
+        
+    }
+
     return {
-        displayGameBoard,
+        init,
     };
 })();
 
 const Player = (name, marker) => {
-    let id = null;
-    (marker === 'x') ? id = 0 : id = 1;
-
     const playerMarker = marker;
     const setName = (name) => name;
     const getName = () => name;
 
-    const setHandlers = () => {
-        const container = document.querySelector(".container").children;
-        for (item of container) {
-            item.addEventListener('click', placeMove);
-        }
-    }
-
     const placeMove = e => {
+
         if (e.target == 'x' || e.target == 'o') {
             return;
         } else {
+            // const container = document.querySelector(".container").children;
+            // container[e.target.id - 1].innerHTML = playerMarker;
+            console.log(e.target.id-1)
             const board = gameBoard.getBoard();
             board[e.target.id - 1] = playerMarker;
             gameBoard.setBoard(board);
         }
-        displayController.displayGameBoard();
-        // change player turn
-        playerTurn = (Players[0].id == 0) ? Players[1].id : Players[0].id;
 
+        // displayController.displayGameBoard();
+        // removeHandlers();
+        // displayController.changePlayer();
     };
 
     return {
-        id: id,
         setName: setName,
         getName: getName,
-        setHandlers,
         placeMove,
     };
 };
 
-function playGame() {
-    // get game preference (AI or Humans for both)
-    const Players = [];
-    
-    gameBoard.createBoard();
-    const player1 = Player('player1', 'x');
-    player1.setHandlers();
-    const player2 = Player('player2', 'o');
-    player2.setHandlers();
-
-    Players.push(player1);
-    Players.push(player2);   
-    // const playerTurn = (Players[0].id == 0) ? Players[1].id : Players[0].id;
-
-    displayController.displayGameBoard();
-
-}
-
-playGame();
+displayController.init();
