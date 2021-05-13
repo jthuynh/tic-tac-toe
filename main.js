@@ -68,16 +68,28 @@ const displayController =(() => {
         return false
     }
 
-    const endGame = result => {
-        if (result == "t") {
-            alert("There was a tie!");
-        } else if (result == "0") {
-            alert("Player 1 won!");
-        } else if (result == "1") {
-            alert("Player 2 won!");
+    const endGame = res => {
+        const container = document.querySelector(".container").children;
+        for (item of container) {
+            item.removeEventListener("click", clickFunction, false);
         }
 
-        // remove all handlers
+        let str = "";
+        
+        if (res == "t") {
+            str = "TIE!";
+        } else if (res == "0") {
+            str = "Player 1 won!";
+        } else if (res == "1") {
+            str = "Player 2 won!";
+        }
+        console.log(str);
+        const result = document.createElement('p');
+        result.innerHTML = str;
+        result.classList.add('result');
+        const wrapper = document.querySelector(".wrapper");
+        // console.log(wrapper);
+        wrapper.appendChild(result);
     }
 
     const init = () => {

@@ -28,3 +28,10 @@ h1 {
     font-size: 40px;
     background-color: aliceblue;
 }
+
+.result {
+    padding-top: 0.50em;
+    padding-bottom: 1em;
+    color: orange;
+    font-size: 24px;
+}
