@@ -1,5 +1,6 @@
 const gameBoard = (() => {
     let board = [];
+    let empty_tiles = [0,1,2,3,4,5,6,7,8];
 
     const setBoard = (newBoard) => board = newBoard;
     const getBoard = () => board;
@@ -9,21 +10,25 @@ const gameBoard = (() => {
     };
 
     const placeMove = (index, mark) => {
-        board[index] = mark
+        board[index] = mark;
     }
 
-    const getMove = (index) => {
-        return board[index]
+    const getEmptyTiles = () => {
+        return empty_tiles;
+    }
+
+    const removeTile = (idx) => {
+        empty_tiles.splice(idx, 1);
     }
 
     const isBoardFull = () => {
         for (let i = 0; i < board.length; i++) {
             if (board[i] == '') {
-                return false
+                return false;
             }
         }
 
-        return true
+        return true;
     }
 
     return{
@@ -31,14 +36,15 @@ const gameBoard = (() => {
         getBoard: getBoard,
         createBoard,
         placeMove,
-        getMove,
+        getEmptyTiles,
+        removeTile,
         isBoardFull,
         // setBoardHandlers
     };
 })();
 
 const displayController =(() => {
-    let turn = 0
+    let turn = 0;
     let players = [];
     const displayGameBoard = () => {
         let board = gameBoard.getBoard();
@@ -50,7 +56,7 @@ const displayController =(() => {
     }
 
     const changePlayer = () => {
-        (turn == 0) ? turn = 1: turn = 0
+        (turn == 0) ? turn = 1: turn = 0;
         // console.log(turn)
     }
 
@@ -61,11 +67,11 @@ const displayController =(() => {
             if (board[winLines[i][0]] != "" && 
                 board[winLines[i][0]] === board[winLines[i][1]] && 
                 board[winLines[i][0]] === board[winLines[i][2]]) {
-                    return true
+                    return true;
             } 
         }
 
-        return false
+        return false;
     }
 
     const endGame = res => {
@@ -92,14 +98,24 @@ const displayController =(() => {
         wrapper.appendChild(result);
     }
 
+    const createPlayers = () => {
+        // TODO
+        // give access to button clicks for both players
+        // if button in player 1 selection: change the player name and highlight button selected
+        // gray out buttons not selected
+        // add players to players array
+    }
+
     const init = () => {
         // Set up the board
         gameBoard.createBoard();
-        // Set up the players
-        const player1 = Player('player1', 'x');
-        const player2 = Player('player2', 'o');
-        players.push(player1);
-        players.push(player2);
+        // Create Players
+        createPlayers();
+        // const player1 = Player('player1', 'x');
+        // const player2 = Player('player2', 'o');
+        // players.push(player1);
+        // players.push(player2);
+
         // play game
         playGame();
     }
@@ -137,7 +153,8 @@ const displayController =(() => {
 
 const Player = (name, marker) => {
     const playerMarker = marker;
-    const setName = (name) => name;
+    const playerName = name;
+    // const setName = (name) => name;
     const getName = () => name;
 
     const placeMove = e => {
@@ -147,7 +164,7 @@ const Player = (name, marker) => {
         } else {
             // const container = document.querySelector(".container").children;
             // container[e.target.id - 1].innerHTML = playerMarker;
-            console.log(e.target.id-1)
+            console.log(e.target.id-1);
             const board = gameBoard.getBoard();
             board[e.target.id - 1] = playerMarker;
             gameBoard.setBoard(board);
@@ -159,10 +176,45 @@ const Player = (name, marker) => {
     };
 
     return {
-        setName: setName,
+        // setName: setName,
         getName: getName,
         placeMove,
     };
 };
 
+const RandomAI = (name, marker) => {
+    const prototype = Player(name, marker);
+    const placeMove = () => {
+        console.log('easy nerd stuff');
+        // if (e.target == 'x' || e.target == 'o') {
+        //     return;
+        // } else {
+        //     const empty_tiles = gameBoard.getEmptyTiles();
+        //     var rand_tile = empty_tiles[Math.floor(Math.random() * empty_tiles.length)];
+        //     const board = gameBoard.getBoard();
+        //     board[e.target.id - 1] = playerMarker;
+        //     gameBoard.setBoard(board);
+        //     gameBoard.removeTile(rand_tile);
+        // }
+        // find the best value using the minimax algorithm to figure out the values of each move
+        // use teh remaining moves left to recurse through
+        // check for win where it's the human, ai, or tie
+    };
+    return Object.assign({}, prototype, {placeMove});
+}
+
+const UnbeatableAI = (name, marker) => {
+    const prototype = Player(name, marker);
+    const placeMove = () => {
+        console.log('hard nerd stuff');
+    };
+    return Object.assign({}, prototype, {placeMove});
+}
+
 displayController.init();
+
+// TODO: 
+// 1. Random AI
+// 2. Unbeatable AI
+// 3. Reset Button
+// make UI pretty

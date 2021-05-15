@@ -1,3 +1,24 @@
+.player-selection {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.player1-selection, .player2-selection {
+    font-size: 18px;
+    color: green;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2em 2em 2em 2em;
+
+}
+
+button {
+    margin-top:10px;
+    color: black;
+}
+
 .wrapper {
     display: flex;
     justify-content: center;
