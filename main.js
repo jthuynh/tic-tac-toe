@@ -101,6 +101,8 @@ const displayController =(() => {
 
         if (e.target.id[0] == "h") {
             player = Player(e.target.id, marker, "Player");
+            const container = document.querySelector(".container").children;
+            
         } else if (e.target.id[0] == "r") {
             player = RandomAI(e.target.id, marker, "Computer");
         } else if (e.target.id[0] == "u") {
@@ -118,8 +120,11 @@ const displayController =(() => {
             }
         }
 
-        if (players[0] != null && players[1] != null) {
-            playGame();
+        if (players[0].type == "Player" || players[1].type == "Player") {
+            const container = document.querySelector(".container").children;
+            for (item of container) {
+                item.addEventListener('click', clickFunction);
+            }
         }
     }
 
@@ -145,9 +150,10 @@ const displayController =(() => {
     }
 
     const clickFunction = e => {
+        
         // place Move
         // console.log(players[turn].prototype.toString.call(t));
-        console.log(players[turn].type);
+        // console.log(players[turn].type);
         if (players[turn].type == "Player") {
             players[turn].placeMove(e);
             // remove Click Function from current id                                                 
@@ -155,40 +161,51 @@ const displayController =(() => {
             tile.removeEventListener("click", clickFunction, false);
         } 
         
-        // display board
         displayGameBoard();
-        // check for win
-        if (checkWin()) {
-            endGame(`${turn}`);
-        } else if (gameBoard.isBoardFull()) {
-            endGame("t");
-        }
-
         changePlayer();
-        return;
+        playGame();
+        // // display board
+        // displayGameBoard();
+        // // check for win
+        // if (checkWin()) {
+        //     endGame(`${turn}`);
+        // } else if (gameBoard.isBoardFull()) {
+        //     endGame("t");
+        // }
+
+        // changePlayer();
     }
 
     const playGame = () => {
         // set up the handlers for clicking on each tile
-        const container = document.querySelector(".container").children;
-        for (item of container) {
-            item.addEventListener("click", clickFunction);
-        }
+        
 
-        if (players[turn].type == "Computer") {
-            players[turn].placeMove();
-        }
-
-        // display board
-        displayGameBoard();
-        // check for win
-        if (checkWin()) {
+        if (!checkWin()) {
+            if (players[turn].type == "Computer") {
+                players[turn].placeMove();
+            } 
+            if (gameBoard.isBoardFull()) {
+                endGame("t");
+            }
+            displayGameBoard();
+            changePlayer();
+        } else {
             endGame(`${turn}`);
-        } else if (gameBoard.isBoardFull()) {
-            endGame("t");
         }
+        // if (players[turn].type == "Computer") {
+        //     players[turn].placeMove();
+        // }
 
-        changePlayer();
+        // // display board
+        // displayGameBoard();
+        // // check for win
+        // if (checkWin()) {
+        //     endGame(`${turn}`);
+        // } else if (gameBoard.isBoardFull()) {
+        //     endGame("t");
+        // }
+
+        // changePlayer();
 
     }
 
