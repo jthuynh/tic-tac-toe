@@ -19,6 +19,7 @@ const gameBoard = (() => {
 
     const removeTile = (idx) => {
         empty_tiles.splice(idx, 1);
+        console.log(empty_tiles);
     }
 
     const isBoardFull = () => {
@@ -119,12 +120,22 @@ const displayController =(() => {
                 parent.children[i].classList.add('not-selected');
             }
         }
+        if (players[0].type == "Computer" && players[1].type == "Computer") {
+            while(!checkWin()) {
+                playGame();
+            }
 
+            endGame(`${turn}`);
+        }
         if (players[0].type == "Player" || players[1].type == "Player") {
             const container = document.querySelector(".container").children;
             for (item of container) {
                 item.addEventListener('click', clickFunction);
             }
+            
+        }
+        if (players[0].type == "Computer" && players[1].type == "Player") {
+            playGame();
         }
     }
 
@@ -221,9 +232,14 @@ const Player = (name, marker, type) => {
             return;
         } else {
             console.log(e.target.id-1);
-            const board = gameBoard.getBoard();
-            board[e.target.id - 1] = marker;
-            gameBoard.setBoard(board);
+            // const board = gameBoard.getBoard();
+            // board[e.target.id - 1] = marker;
+            // gameBoard.setBoard(board);
+            const empty_tiles = gameBoard.getEmptyTiles();
+
+            gameBoard.placeMove(e.target.id - 1, marker);
+            gameBoard.removeTile(empty_tiles.indexOf(e.target.id - 1));
+            console.log("player ", empty_tiles, empty_tiles.indexOf(e.target.id - 1));
         }
     };
 
@@ -242,12 +258,16 @@ const RandomAI = (name, marker, type) => {
         //     return;
         // } else {
             const empty_tiles = gameBoard.getEmptyTiles();
-            var rand_tile = empty_tiles[Math.floor(Math.random() * empty_tiles.length)];
-            console.log(empty_tiles, rand_tile);
-            const board = gameBoard.getBoard();
-            board[rand_tile] = marker;
-            gameBoard.setBoard(board);
+            // var rand_tile = empty_tiles[Math.floor(Math.random() * empty_tiles.length)];
+            var rand_tile = Math.floor(Math.random() * empty_tiles.length);
+
+            // const board = gameBoard.getBoard();
+            // board[rand_tile] = marker;
+            // gameBoard.setBoard(board);
+            gameBoard.placeMove(empty_tiles[rand_tile], marker);
             gameBoard.removeTile(rand_tile);
+            console.log(rand_tile, marker);
+
             // remove clickFunction for the chosen tile as well;
         // }
         // find the best value using the minimax algorithm to figure out the values of each move
