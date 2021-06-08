@@ -17,9 +17,12 @@ const gameBoard = (() => {
         return empty_tiles;
     }
 
+    const resetEmptyTiles = () => {
+        empty_tiles = [0,1,2,3,4,5,6,7,8];
+    }
+
     const removeTile = (idx) => {
         empty_tiles.splice(idx, 1);
-        console.log(empty_tiles);
     }
 
     const isBoardFull = () => {
@@ -38,6 +41,7 @@ const gameBoard = (() => {
         createBoard,
         placeMove,
         getEmptyTiles,
+        resetEmptyTiles,
         removeTile,
         isBoardFull,
     };
@@ -64,8 +68,8 @@ const displayController =(() => {
         const winLines = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
         for (let i = 0; i < winLines.length; i++) {
             if (board[winLines[i][0]] != "" && 
-                board[winLines[i][0]] === board[winLines[i][1]] && 
-                board[winLines[i][0]] === board[winLines[i][2]]) {
+                board[winLines[i][0]] == board[winLines[i][1]] && 
+                board[winLines[i][0]] == board[winLines[i][2]]) {
                     return true;
             } 
         }
@@ -88,12 +92,10 @@ const displayController =(() => {
         } else if (res == "1") {
             str = "Player 2 won!";
         }
-        const result = document.createElement('p');
+        const result = document.getElementById('result');
         result.innerHTML = str;
-        result.classList.add('result');
-        const wrapper = document.querySelector(".wrapper");
-        wrapper.appendChild(result);
     }
+    
     const disableButtons = e => {
         const parent = e.target.parentElement;
         const player_num = e.target.parentElement.id.slice(-1);
@@ -120,127 +122,123 @@ const displayController =(() => {
                 parent.children[i].classList.add('not-selected');
             }
         }
+
         if (players[0].type == "Computer" && players[1].type == "Computer") {
             while(!checkWin()) {
+                if (gameBoard.isBoardFull()) {
+                    endGame("t");
+                    break;
+                } 
                 playGame();
             }
 
-            endGame(`${turn}`);
+            if (!gameBoard.isBoardFull()) {
+                endGame(`${turn}`);
+            }
         }
+
+        if (players[0].type == "Computer" && players[1].type == "Player") {
+            playGame();
+        }
+
         if (players[0].type == "Player" || players[1].type == "Player") {
             const container = document.querySelector(".container").children;
             for (item of container) {
                 item.addEventListener('click', clickFunction);
             }
-            
-        }
-        if (players[0].type == "Computer" && players[1].type == "Player") {
-            playGame();
         }
     }
 
     const createPlayers = () => {
-        // TODO
-        // give access to button clicks for both players
         const buttons = document.querySelectorAll(".player-button");
         buttons.forEach(button => button.addEventListener('click', disableButtons));
+    }
 
-        // if button in player 1 selection: change the player name and highlight button selected
-        // gray out buttons not selected
-        // add players to players array
+    const resetGame = e => {
+        players = new Array(2);
+        gameBoard.createBoard();
+        gameBoard.resetEmptyTiles();
+        displayGameBoard();
+
+        const buttons = document.querySelectorAll(".player-button");
+        buttons.forEach(button => {
+            button.classList.remove("not-selected","selected");
+            button.disabled = false;
+        });
+        createPlayers();
+        document.getElementById("result").innerHTML = "";
+        turn = 0;
+    }
+
+    const setReset = () => {
+        const resetBtn = document.querySelector("#reset");
+        resetBtn.addEventListener('click', resetGame);
     }
 
     const init = () => {
-        // Set up the board
+        setReset();
         gameBoard.createBoard();
-        // Create Players
-        createPlayers();
-
-        // play game
-        
+        createPlayers();        
     }
 
     const clickFunction = e => {
-        
-        // place Move
-        // console.log(players[turn].prototype.toString.call(t));
-        // console.log(players[turn].type);
         if (players[turn].type == "Player") {
-            players[turn].placeMove(e);
-            // remove Click Function from current id                                                 
+            if (!players[turn].placeMove(e)) {
+                return;
+            }
             const tile = document.getElementById(e.target.id);
             tile.removeEventListener("click", clickFunction, false);
         } 
         
         displayGameBoard();
-        changePlayer();
+        if ((players[0].type == "Player" && players[1].type != "Player")
+            || (players[0].type != "Player" && players[1].type == "Player")){
+            
+                changePlayer();
+        }
         playGame();
-        // // display board
-        // displayGameBoard();
-        // // check for win
-        // if (checkWin()) {
-        //     endGame(`${turn}`);
-        // } else if (gameBoard.isBoardFull()) {
-        //     endGame("t");
-        // }
-
-        // changePlayer();
+    }
+    
+    const removeClick = idx => {
+        const container = document.querySelector(".container").children;
+        console.log(container[idx], container[idx].click);
+        container[idx].removeEventListener("click", clickFunction, false);
+        container[idx].click = false;
     }
 
     const playGame = () => {
-        // set up the handlers for clicking on each tile
-        
+        if (players[turn].type == "Computer") {
+            players[turn].placeMove(); 
+        } 
+        displayGameBoard();
 
         if (!checkWin()) {
-            if (players[turn].type == "Computer") {
-                players[turn].placeMove();
-            } 
             if (gameBoard.isBoardFull()) {
                 endGame("t");
             }
-            displayGameBoard();
             changePlayer();
         } else {
             endGame(`${turn}`);
         }
-        // if (players[turn].type == "Computer") {
-        //     players[turn].placeMove();
-        // }
-
-        // // display board
-        // displayGameBoard();
-        // // check for win
-        // if (checkWin()) {
-        //     endGame(`${turn}`);
-        // } else if (gameBoard.isBoardFull()) {
-        //     endGame("t");
-        // }
-
-        // changePlayer();
-
     }
 
     return {
         init,
+        removeClick
     };
 })();
 
 const Player = (name, marker, type) => {
     const placeMove = e => {
-
-        if (e.target == 'x' || e.target == 'o') {
-            return;
-        } else {
-            console.log(e.target.id-1);
-            // const board = gameBoard.getBoard();
-            // board[e.target.id - 1] = marker;
-            // gameBoard.setBoard(board);
-            const empty_tiles = gameBoard.getEmptyTiles();
-
-            gameBoard.placeMove(e.target.id - 1, marker);
-            gameBoard.removeTile(empty_tiles.indexOf(e.target.id - 1));
-            console.log("player ", empty_tiles, empty_tiles.indexOf(e.target.id - 1));
+        const board = gameBoard.getBoard();
+        if (board[e.target.id - 1] != "") {
+            return false;
         }
+
+        const empty_tiles = gameBoard.getEmptyTiles();
+        gameBoard.placeMove(e.target.id - 1, marker);
+        gameBoard.removeTile(empty_tiles.indexOf(e.target.id - 1));
+        return true;
     };
 
     return {
@@ -253,23 +251,11 @@ const Player = (name, marker, type) => {
 const RandomAI = (name, marker, type) => {
     const prototype = Player(name, marker, type);
     const placeMove = () => {
-        // console.log('easy nerd stuff');
-        // if (e.target == 'x' || e.target == 'o') {
-        //     return;
-        // } else {
-            const empty_tiles = gameBoard.getEmptyTiles();
-            // var rand_tile = empty_tiles[Math.floor(Math.random() * empty_tiles.length)];
-            var rand_tile = Math.floor(Math.random() * empty_tiles.length);
+        const empty_tiles = gameBoard.getEmptyTiles();
+        var rand_tile = Math.floor(Math.random() * empty_tiles.length);
+        gameBoard.placeMove(empty_tiles[rand_tile], marker);
+        gameBoard.removeTile(rand_tile);
 
-            // const board = gameBoard.getBoard();
-            // board[rand_tile] = marker;
-            // gameBoard.setBoard(board);
-            gameBoard.placeMove(empty_tiles[rand_tile], marker);
-            gameBoard.removeTile(rand_tile);
-            console.log(rand_tile, marker);
-
-            // remove clickFunction for the chosen tile as well;
-        // }
         // find the best value using the minimax algorithm to figure out the values of each move
         // use teh remaining moves left to recurse through
         // check for win where it's the human, ai, or tie
