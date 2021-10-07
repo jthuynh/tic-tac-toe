@@ -55,6 +55,11 @@ const displayController =(() => {
 
         const container = document.querySelector(".container").children;
         for (let i = 0; i < container.length; i++) {
+            if (board[i] == "x") {
+                container[i].style.color = "#8F91FF";
+            } else if (board[i] == "o") {
+                container[i].style.color = "#5CB85C";
+            }
             container[i].innerHTML = board[i];
         }
     }
@@ -84,15 +89,18 @@ const displayController =(() => {
         }
 
         let str = "";
-        
+        const result = document.getElementById('result');
+
         if (res == "t") {
             str = "TIE!";
+            result.style.color = "white";
         } else if (res == "0") {
             str = "Player 1 won!";
+            result.classList.add("player1-color");
         } else if (res == "1") {
             str = "Player 2 won!";
+            result.classList.add("player2-color");
         }
-        const result = document.getElementById('result');
         result.innerHTML = str;
     }
     
@@ -108,9 +116,10 @@ const displayController =(() => {
             
         } else if (e.target.id[0] == "r") {
             player = RandomAI(e.target.id, marker, "Computer");
-        } else if (e.target.id[0] == "u") {
-            player = UnbeatableAI(e.target.id, marker, "Computer");
-        }
+        } 
+        // else if (e.target.id[0] == "u") {
+        //     player = UnbeatableAI(e.target.id, marker, "Computer");
+        // }
         players[parseInt(player_num) - 1] = player;
 
         for (let i = 1; i < parent.children.length; i++) {
@@ -263,12 +272,12 @@ const RandomAI = (name, marker, type) => {
     return Object.assign({}, prototype, {placeMove});
 }
 
-const UnbeatableAI = (name, marker, type) => {
-    const prototype = Player(name, marker);
-    const placeMove = () => {
-        console.log('hard nerd stuff');
-    };
-    return Object.assign({}, prototype, {placeMove});
-}
+// const UnbeatableAI = (name, marker, type) => {
+//     const prototype = Player(name, marker);
+//     const placeMove = () => {
+//         console.log('hard nerd stuff');
+//     };
+//     return Object.assign({}, prototype, {placeMove});
+// }
 
 displayController.init();

@@ -1,7 +1,7 @@
 
 body {
     background-color: #595959;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Montserrat", Arial, Helvetica, sans-serif;
 }
 
 .player-selection {
@@ -16,8 +16,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 2em 2em 2em 2em;
-
+    padding: 1em 1em 1em 1em;
 }
 
 .player1-selection {
@@ -33,7 +32,6 @@ button {
     color: white;
     background-color: #60C1C8;
     transition: all .5s ease;
-    /* color: #fff; */
     border: 3px solid white;
     font-family:'Montserrat', sans-serif;
     text-transform: uppercase;
@@ -57,12 +55,28 @@ button:hover {
     flex-direction: column;
 }
 
-
 h1 {
+    font-size: 35px;
+    margin-top: 20px;
+}
+
+h1, h2 {
     text-align: center;
     color: white;
 }
 
+p {
+    text-align: center;
+    font-size: 20px;
+}
+
+.player1-color {
+    color: #8F91FF;
+}
+
+.player2-color {
+    color: #5CB85C;
+}
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -84,18 +98,11 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 70px;
 }
 
-/* #reset {
-    background-color: #FFFFFF;
-    color: black;
-} */
-
 .result {
-    padding-top: 0.50em;
-    padding-bottom: 1em;
-    
+    padding-top: 1em;
     font-size: 24px;
 }
 
